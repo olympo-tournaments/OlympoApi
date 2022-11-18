@@ -1,0 +1,74 @@
+[
+	{
+		"id": 1,
+		"title": "ERR_APPLICATION",
+		"detail": "Ocorreu um erro ao realizar esta operação",
+		"status": 500
+	},
+	{
+		"id": 2,
+		"title": "ERR_INVALID_DATA",
+		"detail": "Valores em branco",
+		"status": 422
+	},
+	{
+		"id": 3,
+		"title": "ERR_USER_EXISTS",
+		"detail": "Este usuário já existe!",
+		"status": 422
+	},
+	{
+		"id": 4,
+		"title": "ERR_ACCESS_API",
+		"detail": "b",
+		"status": 404
+	},
+	{
+		"id": 5,
+		"title": "ERR_USER_NOT_FOUND",
+		"detail": "Nenhum usuário encontrado",
+		"status": 404
+	},
+	{
+		"id": 6,
+		"title": "ERR_USER_INCORRECT",
+		"detail": "Usuário ou senha incorretos!",
+		"status": 422
+	},
+	{
+		"id": 7,
+		"title": "ERR_TOKEN_EXPIRED",
+		"detail": "O token expirou ou é invalido!",
+		"status": 422
+	},
+	{
+		"id": 8,
+		"title": "ERR_PAGE_NOT_FOUND",
+		"detail": "Página não encontrada",
+		"status": 404
+	},
+	{
+		"id": 9,
+		"title": "ERR_UNAUTHORIZED",
+		"detail": "Sem autorização!",
+		"status": 401
+	},
+	{
+		"id": 10,
+		"title": "ERR_TOKEN_INVALID",
+		"detail": "Insira um token valido!",
+		"status": 422
+	},
+	{
+		"id": 11,
+		"title": "ERR_INVITE_EXISTS",
+		"detail": "Este código de invite já existe!",
+		"status": 401
+	},
+	{
+		"id": 12,
+		"title": "ERR_TOURNAMENT_NOT_FOUND",
+		"detail": "Torneio não encontrado!",
+		"status": 404
+	}
+]
