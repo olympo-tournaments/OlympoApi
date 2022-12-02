@@ -26,12 +26,19 @@ class Rotas
         $methodServer = isset($_POST['_method']) ? $_POST['_method'] : $methodServer;
         $rota = $methodServer.":/".$rota;
 
-        
         if (substr_count($rota, "/") >= 3) {
-            $param = substr($rota, strrpos($rota, "/")+1);
-            $rota = substr($rota, 0, strrpos($rota, "/"))."/[PARAM]";
+            if(substr_count($rota, "/") == 4) {
+                $param = substr($rota, strrpos($rota, "/"));
+                print_r($param);
+                $a = explode("/", $rota);
+                $a[3] = "[PARAM]";
+                $rota = implode('/', $a);
+            }else {
+                $param = substr($rota, strrpos($rota, "/")+1);
+                $rota = substr($rota, 0, strrpos($rota, "/"))."/[PARAM]";
+            }
         }
-        
+
         $indice = array_search($rota, $this->listaRotas);
         if ($indice > 0) {
             $callback = explode("::", $this->listaCallback[$indice]);
@@ -42,9 +49,8 @@ class Rotas
         $class = isset($callback[0]) ? $callback[0] : '';
         $method = isset($callback[1]) ? $callback[1] : '';
 
-        $err = new Errors(); 
-
-        if (class_exists($class)){            
+        $err = new Errors();   
+        if (class_exists($class)){     
             if (method_exists($class, $method)){                
                 $instanciaClass = new $class();
                 if ($protecao) {
@@ -92,7 +98,6 @@ class Rotas
         } else {
             $this->naoExiste();
         }
-
     }
 
     private function naoExiste()

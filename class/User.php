@@ -1,7 +1,7 @@
 <?php 
 	class User {
-		private $access_exp = 800;
-		private $refresh_exp = 800;
+		private $access_exp = 60 * 60* 24;
+		private $refresh_exp = 60 * 60 * 24 * 3;
 		public function authenticate(){
 			$post = file_get_contents("php://input");
 			$err = new Errors();
@@ -14,7 +14,8 @@
 			        $res = ["errors"=> [$err]];
 
 			        http_response_code($err['status']);
-			        echo json_encode($res);
+			        $json = json_encode($res);
+					echo base64_encode($json);
         			exit;	
 				}
 
@@ -61,10 +62,12 @@
 					 $date = date('Y-m-d H:i:s', $time_exp_refresh);
 					 $query->execute(array($idUser, $signature_access_token, $signature_refresh_token, $date));
 
-					$response = ["data"=>$this->userTokenReturn($idUser, $data['name'], $data['email'], $data['username'], null, $token, $refresh_token)];
+					$res = ["data"=>$this->userTokenReturn($idUser, $data['name'], $data['email'], $data['username'], null, $token, $refresh_token)];
 
-					echo json_encode($response);
-		                http_response_code(201);
+			        $json = json_encode($res);
+					// echo base64_encode($json);
+					 echo $json;
+					http_response_code(200);
 		                exit;
 
 
@@ -73,7 +76,9 @@
 			        	$res = ["errors"=> [$err]];
 
 			        	http_response_code($err['status']);
-			        	echo json_encode($res);
+						$json = json_encode($res);
+						echo $json;
+						// echo base64_encode($json);
         				exit;
 	            }
 
@@ -83,9 +88,11 @@
 		        $res = ["errors"=> [$err]];
 
 		        http_response_code($err['status']);
-		        echo json_encode($res);
+				$json = json_encode($res);
+					 echo $json;
+					 // echo base64_encode($json);
 				exit;
-			}
+			}//ok
 		}
 
 		public function post(){
@@ -100,7 +107,9 @@
 			        $res = ["errors"=> [$err]];
 
 			        http_response_code($err['status']);
-			        echo json_encode($res);
+			        $json = json_encode($res);
+					 echo $json;
+					 // echo base64_encode($json);
         			exit;	
 				}
 
@@ -114,7 +123,9 @@
 			        $res = ["errors"=> [$err]];
 
 			        http_response_code($err['status']);
-			        echo json_encode($res);
+			        $json = json_encode($res);
+					 echo $json;
+					//  echo base64_encode($json);
         			exit;	
 		        } else {
 		        	try {
@@ -153,9 +164,11 @@
 						 $date = date('Y-m-d H:i:s', $time_exp_refresh);
 						 $query->execute(array($idUser, $signature_access_token, $signature_refresh_token, $date));
 
-						 $response = ["data"=>$this->userTokenReturn($idUser, $data['name'], $data['email'], $data['username'], null, $token, $refresh_token)];
+						 $res = ["data"=>$this->userTokenReturn($idUser, $data['name'], $data['email'], $data['username'], null, $token, $refresh_token)];
 
-		                echo json_encode($response);
+						 $json = json_encode($res);
+					 echo $json;
+					 //  echo base64_encode($json);
 		                http_response_code(201);
 		                exit;
 
@@ -176,9 +189,11 @@
 		        $res = ["errors"=> [$err]];
 
 		        http_response_code($err['status']);
-		        echo json_encode($res);
+				$json = json_encode($res);
+					 echo $json;
+					 // echo base64_encode($json);
 				exit;
-			}
+			}//ok
 		}
 
 		public function get(){
@@ -197,15 +212,17 @@
 	            }
 
 	            if(sizeof($res) !== 0) {
-	            	$response = ["data"=>$res];
-	            	echo json_encode($response);
+	            	$res = ["data"=>$res];
+	            	echo json_encode($res);
 	            	http_response_code(200);
 	            } else {
 	            	$err = $err->getError("ERR_APPLICATION");
 			        $res = ["errors"=> [$err]];
 
 			        http_response_code($err['status']);
-			        echo json_encode($res);
+			        $json = json_encode($res);
+					 echo $json;
+					 // echo base64_encode($json);
 					exit;
 	            }
 	        } else {
@@ -213,9 +230,11 @@
 		        $res = ["errors"=> [$err]];
 
 		        http_response_code($err['status']);
-		        echo json_encode($res);
+				$json = json_encode($res);
+					 echo $json;
+					 // echo base64_encode($json);
 				exit;
-	        }
+	        }//ok
 		}
 
 		public function find($param){
@@ -229,17 +248,21 @@
 
 	            $res = $this->userReturn($data['id'], $data['name'], $data['email'], $data['username'], $data['photo']);
 
-            	$response = ["data"=>$res];
-            	echo json_encode($response);
+            	$res = ["data"=>$res];
+				$json = json_encode($res);
+					 echo $json;
+					 // echo base64_encode($json);
             	http_response_code(200);
 	        } else {
 		        $err = $err->getError("ERR_USER_NOT_FOUND");
 		        $res = ["errors"=> [$err]];
 
 		        http_response_code($err['status']);
-		        echo json_encode($res);
+				$json = json_encode($res);
+					 echo $json;
+					 // echo base64_encode($json);
 				exit;
-	        }
+	        }//ok
 		}
 
 		public function put(){
@@ -259,6 +282,206 @@
 
 		public function getStats(){
 			echo "Receber estatisticas do usuário";
+		}
+
+		public function getUserTournaments($param) {
+			$err = new Errors();
+
+			$sql = MySql::conectar()->prepare("SELECT * FROM team_tournament_members AS members INNER JOIN `tournaments` ON members.id_tournament = tournaments.id_tournament INNER JOIN `tournament_sports` AS sport ON tournaments.sport = sport.id_sport INNER JOIN `team_tournament` AS team ON members.id_team = team.id_team WHERE id_user=?");
+        	$sql->execute(array($param));
+	        if(($sql) AND ($sql->rowCount() != 0)) {
+	        	$res = [];
+
+				$i = 0;
+	            while($data=$sql->fetch(PDO::FETCH_ASSOC)){
+	                // extract($pesquisa);
+	                // $tournament = [
+
+	                // ];
+	                $res[$i] = Returns::userTournamentReturn($data);
+	                $i++;
+	            }
+
+				$response = ["data"=>$res];
+				 echo json_encode($response);
+					 // echo base64_encode($json);
+            	http_response_code(200);
+	        } else {
+		        $err = $err->getError("ERR_USER_NOT_FOUND");
+		        $res = ["errors"=> [$err]];
+
+		        http_response_code($err['status']);
+				$json = json_encode($res);
+					 echo $json;
+					 // echo base64_encode($json);
+				exit;
+	        }
+		}//ok
+
+		public function getUserFavorites($param, $jwt) {
+			$err = new Errors();
+
+			$jwt = (array)$jwt;
+
+			$sql = MySql::conectar()->prepare("SELECT * FROM `tournaments_favorites` INNER JOIN `tournaments` ON tournaments.id_tournament = tournaments_favorites.id_tournament WHERE id_user=?");
+        	$sql->execute(array($jwt['id']));
+
+	        if(($sql) AND ($sql->rowCount() != 0)) {
+	        	$i = 0;
+	        	$res = [];
+	            while($data=$sql->fetch(PDO::FETCH_ASSOC)){
+	                $res[$i]=Returns::tournamentReturn($data);
+	                $i++;
+	            }
+
+            	$response = ["data"=>$res];
+            	echo json_encode($response);
+            	http_response_code(200);
+	        } else {
+		        $err = $err->getError("ERR_TOURNAMENT_NOT_FOUND");
+		        $res = ["errors"=> [$err]];
+
+		        http_response_code($err['status']);
+		        echo json_encode($res);
+				exit;
+	        }
+		}//ok
+
+		public function addUserFavorites($param, $jwt) {
+			$post = file_get_contents("php://input");
+			$err = new Errors();
+
+			if($post) {
+				$data = json_decode($post, true);
+
+				if(!isset($data['id_tournament'])) {
+			        $err = $err->getError("ERR_INVALID_DATA");
+			        $res = ["errors"=> [$err]];
+
+			        http_response_code($err['status']);
+			        $json = json_encode($res);
+					 echo $json;
+					 // echo base64_encode($json);
+        			exit;	
+				}
+
+				$id_tournament = $data['id_tournament'];
+
+				$jwt = (array)$jwt;
+
+				$verifyAlreadyFavorite = MySql::conectar()->prepare("SELECT * FROM `tournaments_favorites` WHERE id_user=? AND id_tournament=?");
+				$verifyAlreadyFavorite->execute(array($jwt['id'], $id_tournament));
+
+				if($verifyAlreadyFavorite->rowCount()>= 1){
+					$err = $err->getError("ERR_TOURNAMENT_FAVORITED");
+			        $res = ["errors"=> [$err]];
+
+			        http_response_code($err['status']);
+			        $json = json_encode($res);
+					 echo $json;
+        			exit;
+				}
+
+				$sql = MySql::conectar()->prepare("INSERT INTO `tournaments_favorites` (id_user, id_tournament) VALUES(?,?)");
+				$sql->execute(array($jwt['id'], $id_tournament));
+
+				$userFavorites = MySql::conectar()->prepare("SELECT * FROM `tournaments_favorites` INNER JOIN `tournaments` ON tournaments.id_tournament = tournaments_favorites.id_tournament WHERE id_user=? ");
+				$userFavorites->execute(array($jwt['id']));
+
+				if(($userFavorites) AND ($userFavorites->rowCount() != 0)) {
+		        	$i = 0;
+		        	$res = [];
+		            while($data=$userFavorites->fetch(PDO::FETCH_ASSOC)){
+		                $res[$i]=Returns::tournamentReturn($data);
+		                $i++;
+		            }
+
+	            	$response = ["data"=>$res];
+	            	echo json_encode($response);
+	            	http_response_code(200);
+		        } else {
+			        $err = $err->getError("ERR_TOURNAMENT_NOT_FOUND");
+			        $res = ["errors"=> [$err]];
+
+			        http_response_code($err['status']);
+			        echo json_encode($res);
+					exit;
+		        }
+
+
+			} else {
+
+		        $err = $err->getError("ERR_INVALID_DATA");
+		        $res = ["errors"=> [$err]];
+
+		        http_response_code($err['status']);
+				$json = json_encode($res);
+					 echo $json;
+					 // echo base64_encode($json);
+				exit;
+			}
+		}//ok
+
+		public function getAllUserMatches($param, $jwt) {
+			$err = new Errors();
+
+			$jwt = (array)$jwt;
+
+			$sql = MySql::conectar()->prepare("SELECT * FROM `matches` INNER JOIN team_tournament_members AS members ON members.id_user=? WHERE id_team1=members.id_team OR id_team2=members.id_team");
+        	$sql->execute(array($jwt['id']));
+
+	        if(($sql) AND ($sql->rowCount() != 0)) {
+	        	$i = 0;
+	        	$res = [];
+	            while($data=$sql->fetch(PDO::FETCH_ASSOC)){
+	                $res[$i]=Returns::Match($data);
+	                $i++;
+	            }
+
+            	$response = ["data"=>$res];
+            	echo json_encode($response);
+            	http_response_code(200);
+	        } else {
+		        $err = $err->getError("ERR_TOURNAMENT_NOT_FOUND");
+		        $res = ["errors"=> [$err]];
+
+		        http_response_code($err['status']);
+		        echo json_encode($res);
+				exit;
+	        }
+		}
+
+		public function getUserMatches($param, $jwt) {
+			$err = new Errors();
+
+			$jwt = (array)$jwt;
+
+			// $sql = MySql::conectar()->prepare("SELECT * FROM `matches` INNER JOIN team_tournament_members AS members ON members.id_user=? WHERE id_team1=members.id_team OR id_team2=members.id_team");
+			// $sql = MySql::conectar()->prepare("SELECT * FROM `matches` INNER JOIN tournaments AS `t` ON t.id_tournament = matches.id_tournament INNER JOIN team_tournament_members AS team1 ON team1.id_user=:id_user INNER JOIN team_tournament_members AS team2 ON team2.id_user=:id_user WHERE id_team1=team1.id_team OR id_team2=team2.id_team");
+        	// $sql->bindParam(':id_user', $jwt['id']);
+			// $sql->execute();
+			$sql = MySql::conectar()->prepare("SELECT * FROM `matches` INNER JOIN team_tournament_members AS members ON members.id_user=? WHERE result IS NULL AND id_team1=members.id_team OR id_team2=members.id_team ");
+			$sql->execute(array($jwt['id']));
+
+	        if(($sql) AND ($sql->rowCount() != 0)) {
+	        	$i = 0;
+	        	$res = [];
+	            while($data=$sql->fetch(PDO::FETCH_ASSOC)){
+	                $res[$i]=Returns::Match($data);
+	                $i++;
+	            }
+
+            	$response = ["data"=>$res];
+            	echo json_encode($response);
+            	http_response_code(200);
+	        } else {
+		        $err = $err->getError("ERR_TOURNAMENT_NOT_FOUND");
+		        $res = ["errors"=> [$err]];
+
+		        http_response_code($err['status']);
+		        echo json_encode($res);
+				exit;
+	        }
 		}
 
 		//middlewares
@@ -285,11 +508,13 @@
 		        $res = ["errors"=> [$err]];
 
 		        http_response_code($err['status']);
-		        echo json_encode($res);
+				$json = json_encode($res);
+					 echo $json;
+					 // echo base64_encode($json);
 				exit;
 			}
 
-		}
+		}//ok
 
 		public function validateJwt(){
             $err = new Errors();
@@ -302,7 +527,9 @@
 			        $res = ["errors"=> [$err]];
 
 			        http_response_code($err['status']);
-			        echo json_encode($res);
+			        $json = json_encode($res);
+					 echo $json;
+					 // echo base64_encode($json);
 		            exit;
 	            }
 	        } else {
@@ -310,7 +537,9 @@
 		        $res = ["errors"=> [$err]];
 
 		        http_response_code($err['status']);
-		        echo json_encode($res);
+				$json = json_encode($res);
+					 echo $json;
+					 // echo base64_encode($json);
 	            exit;
 	        }
 
@@ -323,35 +552,41 @@
 	        	return $expired;
 	        }
 	        else return false;
-		}
+		}//ok
 
 		public function refresh() {
+			//implementar a blacklist aqui, n ta funcionando
             $post = file_get_contents("php://input");
             $err = new Errors();
-
+			
             if($post) {
-                $data = json_decode($post, true);
+				$headers = apache_request_headers();
+				$data = json_decode($post, true);
                 if(!isset($data['refresh_token'])) {
                     $err = $err->getError("ERR_TOKEN_INVALID");
                     $res = ["errors"=> [$err]];
 
                     http_response_code($err['status']);
-                    echo json_encode($res);
+			        $json = json_encode($res);
+					echo $json;
                     exit;
                 }
                 $refresh_token = $data['refresh_token'];
+				$token = $headers['Authorization'];
 
                 $jwt = new JwtClass();
-                $token_expired = $jwt->isExpiredToken($refresh_token);
+				
+                $refresh_token_expired = $jwt->isExpiredToken($refresh_token);
 
-                if($token_expired) {
-                    $err = $err->getError("ERR_TOKEN_INVALID");
+				if(!$refresh_token_expired) {
+					$err = $err->getError("ERR_INVALID_REFRESH");
                     $res = ["errors"=> [$err]];
-
+					
                     http_response_code($err['status']);
-                    echo json_encode($res);
+			        $json = json_encode($res);
+					echo $json;
                     exit;
-                }
+				}
 
                 $payload_refresh_token = $jwt->extractDataJWT($refresh_token, 1);
 		        $signature_refresh_token = $jwt->extractDataJWT($refresh_token, 2);
@@ -362,7 +597,6 @@
                 if(($sql) AND ($sql->rowCount() != 0)) {
 
                 	$data = $sql->fetch(PDO::FETCH_ASSOC);
-                	// print_r($data);
 
 		            $idUser = $data['id'];
 
@@ -375,26 +609,28 @@
 					    'id'=>$idUser
 					 ];
 					 $token = $jwt->criaToken($payload);
+					 $signature_access_token = $jwt->extractDataJWT($token, 2);
 
  		            $payload_refresh_token->exp = time()+$this->refresh_exp;
 					 $new_refresh_token = $jwt->criaToken($payload_refresh_token);
 		             $new_signature_refresh_token = $jwt->extractDataJWT($new_refresh_token, 2);
 
-		             $query = MySql::conectar()->prepare("UPDATE token SET refresh_token = ?, expires_date = ? WHERE id = ?");
+		             $query = MySql::conectar()->prepare("UPDATE token SET access_token = ?, refresh_token = ?, expires_date = ? WHERE id = ?");
 					 $date = date('Y-m-d H:i:s', $payload_refresh_token->exp);
-					 $query->execute(array($signature_refresh_token, $date, $data['id']));
+					 $query->execute(array($signature_access_token, $new_signature_refresh_token, $date, $data['id']));
+ 					 $res = ["data"=>$this->userTokenReturn($data['id_user'], $data['name'], $data['email'], $data['username'], $data['photo'], $token, $new_refresh_token)];
 
- 					 $response = ["data"=>$this->userTokenReturn($data['id_user'], $data['name'], $data['email'], $data['username'], $data['photo'], $token, $new_refresh_token)];
 
-	                echo json_encode($response);
-	                http_response_code(200);
+			        $json = json_encode($res);
+					echo $json;
 
             	} else {
 			        $err = $err->getError("ERR_USER_NOT_FOUND");
 			        $res = ["errors"=> [$err]];
 
 			        http_response_code($err['status']);
-			        echo json_encode($res);
+			        $json = json_encode($res);
+					 echo $json;
 					exit;
             	}
 
@@ -402,16 +638,17 @@
                 $err = $err->getError("ERR_INVALID_DATA");
                 $res = ["errors"=> [$err]];
 
-                // http_response_code($err['status']);
-                echo json_encode($res);
+                http_response_code($err['status']);
+				$json = json_encode($res);
+				echo $json;
                 exit;
             }
-		}
+		}//ok
 
 		//returns
 
 		private function userReturn($id, $name, $email, $username, $photo) {
-			$response = [
+			$res = [
             	"type"=> "user",
             	"id"=> $id,
             	"attributes"=>[
@@ -424,10 +661,10 @@
             		"self"=>"/user/".$username
             	]
             ];
-            return $response;
+            return $res;
 		}
 		private function userTokenReturn($id, $name, $email, $username, $photo, $token, $refresh_token) {
-			$response = [
+			$res = [
             	"type"=> "user",
             	"id"=> $id,
             	"attributes"=>[
@@ -441,10 +678,10 @@
             		"refresh_token"=>$refresh_token
             	],
             	"links"=>[
-            		"self"=>'//user//'.$username
+            		"self"=>"/user/".$username
             	]
             ];
-            return $response;
+            return $res;
 		}
 	}
 ?>

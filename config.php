@@ -1,13 +1,14 @@
 <?php 
 
-	header('Access-Control-Allow-Origin: *');
+    header("Access-Control-Allow-Origin: localhost");
+    header("Access-Control-Allow-Headers: X-Requested-With, Content-Type, Origin, Cache-Control, Pragma, Authorization, Accept, Accept-Encoding");
 	// header('Content-type: application/json');
 
 	// session_start();
 	date_default_timezone_set("America/Sao_Paulo");
 
-	define('INCLUDE_PATH','http://molian.com.br/olympo/');
-	// define('INCLUDE_PATH','http://localhost/Olympo%20Tournaments/');
+	// define('INCLUDE_PATH','http://molian.com.br/olympo_api/');
+	define('INCLUDE_PATH','http://localhost/Olympo%20Tournaments/');
 	
 	$autoload = function($class) {
 		include(__DIR__.'/class/'.$class.'.php');

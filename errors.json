@@ -8,7 +8,7 @@
 	{
 		"id": 2,
 		"title": "ERR_INVALID_DATA",
-		"detail": "Valores em branco",
+		"detail": "Valores em branco ou incorretos",
 		"status": 422
 	},
 	{
@@ -33,13 +33,13 @@
 		"id": 6,
 		"title": "ERR_USER_INCORRECT",
 		"detail": "Usuário ou senha incorretos!",
-		"status": 422
+		"status": 404
 	},
 	{
 		"id": 7,
 		"title": "ERR_TOKEN_EXPIRED",
 		"detail": "O token expirou ou é invalido!",
-		"status": 422
+		"status": 401
 	},
 	{
 		"id": 8,
@@ -70,5 +70,83 @@
 		"title": "ERR_TOURNAMENT_NOT_FOUND",
 		"detail": "Torneio não encontrado!",
 		"status": 404
+	},
+	{
+		"id": 13,
+		"title": "ERR_INVALID_REFRESH",
+		"detail": "teste",
+		"status": 401
+	},
+	{
+		"id": 14,
+		"title": "ERR_TEAM_EXISTS",
+		"detail": "Esta equipe ja existe neste torneio",
+		"status": 422
+	},
+	{
+		"id": 15,
+		"title": "ERR_USER_NOT_TEAM",
+		"detail": "Este usuario não faz parte da equipe",
+		"status": 401
+	},
+	{
+		"id": 16,
+		"title": "ERR_USER_TOURNAMENT",
+		"detail": "Este usuario ja esta no torneio",
+		"status": 401
+	},
+	{
+		"id": 17,
+		"title": "ERR_TOURNAMENT_FAVORITED",
+		"detail": "Este torneio ja foi favoritado por este usuario",
+		"status": 401
+	},
+	{
+		"id": 18,
+		"title": "ERR_TEAM_NOT_FOUND",
+		"detail": "Nenhuma equipe encontrado",
+		"status": 404
+	},
+	{
+		"id": 19,
+		"title": "ERR_USER_TEAM_EXISTS",
+		"detail": "Este usuario já esta na equipe",
+		"status": 401
+	},
+	{
+		"id": 20,
+		"title": "ERR_TEAM_LIMIT",
+		"detail": "Esta equipe ja esta no seu limite de usuarios",
+		"status": 401
+	},
+	{
+		"id": 21,
+		"title": "ERR_TOURNAMENT_TEAM_TOTAL",
+		"detail": "As equipes devem ser potencias de 2",
+		"status": 401
+	},
+	{
+		"id": 22,
+		"title": "ERR_TOURNAMENT_STARTED",
+		"detail": "Este torneio já começou!",
+		"status": 401
+	},
+	{
+		"id": 23,
+		"title": "ERR_MATCH_UPDATED",
+		"detail": "Esta partida ja foi definida",
+		"status": 422
+	},
+	{
+		"id": 24,
+		"title": "ERR_VALUES_EQUAL",
+		"detail": "As pontuações não podem ser iguais!",
+		"status": 422
+	},
+	{
+		"id": 25,
+		"title": "ERR_UNDEFINED_MEMBERS_MATCH",
+		"detail": "Membros indefinidos para esta partida, tente novamente mais tarde!!",
+		"status": 422
 	}
 ]
