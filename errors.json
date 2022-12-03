@@ -148,5 +148,11 @@
 		"title": "ERR_UNDEFINED_MEMBERS_MATCH",
 		"detail": "Membros indefinidos para esta partida, tente novamente mais tarde!!",
 		"status": 422
+	},
+	{
+		"id": 26,
+		"title": "ERR_CATEGORY_NOT_FOUND",
+		"detail": "Esporte não encontrado!",
+		"status": 404
 	}
 ]

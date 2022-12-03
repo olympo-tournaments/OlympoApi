@@ -39,6 +39,7 @@ class Rotas
             }
         }
 
+        
         $indice = array_search($rota, $this->listaRotas);
         if ($indice > 0) {
             $callback = explode("::", $this->listaCallback[$indice]);

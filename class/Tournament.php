@@ -307,6 +307,29 @@
 	        }
 		}//ok
 
+		public function findCategory($param) {
+			$err = new Errors();
+
+			$sql = MySql::conectar()->prepare("SELECT * FROM `tournament_sports` WHERE id_sport=? ");
+        	$sql->execute(array($param));
+
+	        if(($sql) AND ($sql->rowCount() != 0)) {
+	            $data = $sql->fetch(PDO::FETCH_ASSOC);
+	            $res = Returns::CategoriesReturn($data);
+
+            	$response = ["data"=>$res];
+            	echo json_encode($response);
+            	http_response_code(200);
+	        } else {
+		        $err = $err->getError("ERR_CATEGORY_NOT_FOUND");
+		        $res = ["errors"=> [$err]];
+
+		        http_response_code($err['status']);
+		        echo json_encode($res);
+				exit;
+	        }//ok
+		}
+
 		public function startTournament($param, $jwt) {
 			$post = file_get_contents("php://input");
 			$err = new Errors();
@@ -479,6 +502,7 @@
 			$err = new Errors();
 
 			$sql = MySql::conectar()->prepare("SELECT * FROM `matches` WHERE id_tournament=? ");
+			// $sql = MySql::conectar()->prepare("SELECT * FROM `matches` INNER JOIN tournaments ON `tournaments.id_tournament`=`matches.id_tournament` WHERE id_tournament=:id_tournament ");
         	$sql->execute(array($param));
 
         	if(($sql) AND ($sql->rowCount() != 0)) {

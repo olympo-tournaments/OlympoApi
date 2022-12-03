@@ -427,13 +427,14 @@
 
 			$jwt = (array)$jwt;
 
-			$sql = MySql::conectar()->prepare("SELECT * FROM `matches` INNER JOIN team_tournament_members AS members ON members.id_user=? WHERE id_team1=members.id_team OR id_team2=members.id_team");
+			$sql = MySql::conectar()->prepare("SELECT * FROM `matches` INNER JOIN team_tournament_members AS members ON members.id_user=? INNER JOIN tournaments ON tournaments.id_tournament=matches.id_tournament WHERE id_team1=members.id_team OR id_team2=members.id_team");
         	$sql->execute(array($jwt['id']));
 
 	        if(($sql) AND ($sql->rowCount() != 0)) {
 	        	$i = 0;
 	        	$res = [];
 	            while($data=$sql->fetch(PDO::FETCH_ASSOC)){
+					// $res[$i] = $data;
 	                $res[$i]=Returns::Match($data);
 	                $i++;
 	            }

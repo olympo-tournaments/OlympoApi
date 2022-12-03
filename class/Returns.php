@@ -1,6 +1,7 @@
 <?php 
 	class Returns {
 		public static function tournamentReturn($tournament){
+			// print_r($tournament);
 			$response = [
             	"type"=> "tournament",
             	"id"=> $tournament['id_tournament'],
@@ -13,7 +14,8 @@
             		// "team_members"=>$tournament['team_members'],
             		"owner"=>$tournament['owner_id'],
             		"active"=>$tournament['active'],
-            		"type"=>$tournament['type']
+            		"type"=>$tournament['type'],
+            		"twitch"=>$tournament['twitch'],
             	],
             	"links"=>[
             		"self"=>"/tournament/".$tournament['id_tournament']
@@ -122,7 +124,13 @@
             	"id"=> $match['id_match'],
             	"attributes"=>[
             		"team2"=>$match['id_team2'],
-            		"id_tournament"=>$match['id_tournament'],
+            		"id_tournament"=>isset($match['name']) ? [
+						"name"=>$match['name'],
+						"photo"=>$match['photo'],
+						"sport"=>$match['sport'],
+						"invitation"=>$match['invitation'],
+						"id"=>$match['id_tournament']
+					] : $match['id_tournament'],
             		"time"=>$match['time'],            		
             		"result"=>$match['result'],   
             		"type"=>$match['type']     ,

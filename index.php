@@ -12,7 +12,7 @@
     $rota->add('DELETE', '/api/user/[PARAM]', 'User::delete', true, $roles['moderator']);
     $rota->add('PATCH', '/api/user/[PARAM]', 'User::patch', true, $roles['user']);
     $rota->add('PUT', '/api/user/[PARAM]', 'User::put', true, $roles['user']);
-    $rota->add('GET', '/api/user/stats', 'User::getStats', true, $roles['adm']);
+    $rota->add('GET', '/api/user/stats', 'User::getStats', true, $roles['user']);
 
     $rota->add('GET', '/user/tournaments/[PARAM]', 'User::getUserTournaments', true, $roles['user']); //ok
     $rota->add('GET', '/user/favorites', 'User::getUserFavorites', true, $roles['user']); //ok
@@ -40,6 +40,7 @@
     // $rota->add('POST', '/tournament/stats/[PARAM]', 'Tournament::setStats', true, $roles['user']);
     
     $rota->add('GET', '/tournament/categories', 'Tournament::getCategories', true, $roles['user']);//ok
+    $rota->add('GET', '/tournament/categories/[PARAM]', 'Tournament::findCategory', true, $roles['user']);//ok
     $rota->add('GET', '/tournament/online', 'Tournament::getOnlineTournaments', true, $roles['user']); //ok
     $rota->add('GET', '/tournament/presencial', 'Tournament::getPresencialTournaments', true, $roles['user']); //ok
 
