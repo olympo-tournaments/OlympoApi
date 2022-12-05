@@ -8,7 +8,7 @@
 			if($post) {
 				$data = json_decode($post, true);
 
-				if(!isset($data['name']) || !isset($data['description']) || !isset($data['sport']) || !isset($data['invitation']) || !isset($data['type'])) {
+				if(!isset($data['name']) || !isset($data['description']) || !isset($data['sport']) || !isset($data['invitation']) || !isset($data['type']) || !isset($data['privacy'])) {
 			        $err = $err->getError("ERR_INVALID_DATA");
 			        $res = ["errors"=> [$err]];
 
@@ -22,6 +22,7 @@
 				$sport = $data['sport'];
 				$invitation = $data['invitation'];
 				$type = $data['type'];
+				$privacy = $data['privacy'];
 
 				try {
 
@@ -63,9 +64,19 @@
 	        			exit;	
 					}
 
+					$privacyTypes = ["open", "only-invites"];
+					if (!in_array($privacy, $privacyTypes)) {
+				        $err = $err->getError("ERR_INVALID_DATA");
+				        $res = ["errors"=> [$err]];
 
-					$sql = MySql::conectar()->prepare("INSERT INTO `tournaments` (name, description, sport, invitation, owner_id, active, type) VALUES (?,?,?,?,?,?,?)");
-					$sql->execute(array($name, $description, $sport, $invitation, $jwt['id'], true, $type));
+				        http_response_code($err['status']);
+				        echo json_encode($res);
+	        			exit;	
+					}
+
+
+					$sql = MySql::conectar()->prepare("INSERT INTO `tournaments` (name, description, sport, invitation, owner_id, active, type, privacy) VALUES (?,?,?,?,?,?,?,?)");
+					$sql->execute(array($name, $description, $sport, $invitation, $jwt['id'], true, $type, $privacy));
 
 					$idTournament = MySql::getLastId();
 
@@ -84,7 +95,8 @@
 		            		"owner_id"=>$jwt['id'],
 		            		"active"=>true,
 		            		"invitation"=>$invitation,
-		            		"type"=>$type
+		            		"type"=>$type,
+							"privacy"=>$privacy
 						];
 
 						$response = ["data"=>Returns::tournamentReturn($tournament)];
@@ -310,8 +322,8 @@
 		public function findCategory($param) {
 			$err = new Errors();
 
-			$sql = MySql::conectar()->prepare("SELECT * FROM `tournament_sports` WHERE id_sport=? ");
-        	$sql->execute(array($param));
+			$sql = MySql::conectar()->prepare("SELECT * FROM `tournament_sports` WHERE sport_name=? OR id_sport=? ");
+        	$sql->execute(array($param, $param));
 
 	        if(($sql) AND ($sql->rowCount() != 0)) {
 	            $data = $sql->fetch(PDO::FETCH_ASSOC);
@@ -322,6 +334,34 @@
             	http_response_code(200);
 	        } else {
 		        $err = $err->getError("ERR_CATEGORY_NOT_FOUND");
+		        $res = ["errors"=> [$err]];
+
+		        http_response_code($err['status']);
+		        echo json_encode($res);
+				exit;
+	        }//ok
+		}
+
+		public function findTournamentByCategory($param) {
+			$err = new Errors();
+
+			$sql = MySql::conectar()->prepare("SELECT * FROM `tournaments` WHERE sport=? ");
+        	$sql->execute(array($param));
+
+	        if(($sql) AND ($sql->rowCount() != 0)) {
+				$res = [];
+				$i = 0;
+				while($data=$sql->fetch(PDO::FETCH_ASSOC)){
+	                // extract($pesquisa);
+	            	$res[$i] = Returns::tournamentReturn($data);
+	            	$i++;
+	            }
+
+            	$response = ["data"=>$res];
+            	echo json_encode($response);
+            	http_response_code(200);
+	        } else {
+		        $err = $err->getError("ERR_TOURNAMENT_NOT_FOUND");
 		        $res = ["errors"=> [$err]];
 
 		        http_response_code($err['status']);

@@ -41,6 +41,7 @@
     
     $rota->add('GET', '/tournament/categories', 'Tournament::getCategories', true, $roles['user']);//ok
     $rota->add('GET', '/tournament/categories/[PARAM]', 'Tournament::findCategory', true, $roles['user']);//ok
+    $rota->add('GET', '/find_tournament/category/[PARAM]', 'Tournament::findTournamentByCategory', true, $roles['user']);//ok
     $rota->add('GET', '/tournament/online', 'Tournament::getOnlineTournaments', true, $roles['user']); //ok
     $rota->add('GET', '/tournament/presencial', 'Tournament::getPresencialTournaments', true, $roles['user']); //ok
 

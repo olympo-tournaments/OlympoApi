@@ -15,7 +15,8 @@
             		"owner"=>$tournament['owner_id'],
             		"active"=>$tournament['active'],
             		"type"=>$tournament['type'],
-            		"twitch"=>$tournament['twitch'],
+            		"twitch"=>isset($tournament['twitch']) ? $tournament['twitch'] : null,
+					"privacy"=>$tournament['privacy']
             	],
             	"links"=>[
             		"self"=>"/tournament/".$tournament['id_tournament']
