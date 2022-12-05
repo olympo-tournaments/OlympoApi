@@ -1,5 +1,6 @@
 <?php 
 	class User {
+		// private $access_exp = 60 * 2;
 		private $access_exp = 60 * 60* 24;
 		private $refresh_exp = 60 * 60 * 24 * 3;
 		public function authenticate(){
@@ -284,11 +285,13 @@
 			echo "Receber estatisticas do usuário";
 		}
 
-		public function getUserTournaments($param) {
+		public function getUserTournaments($param, $jwt) {
 			$err = new Errors();
 
+			$jwt = (array)$jwt;
+
 			$sql = MySql::conectar()->prepare("SELECT * FROM team_tournament_members AS members INNER JOIN `tournaments` ON members.id_tournament = tournaments.id_tournament INNER JOIN `tournament_sports` AS sport ON tournaments.sport = sport.id_sport INNER JOIN `team_tournament` AS team ON members.id_team = team.id_team WHERE id_user=?");
-        	$sql->execute(array($param));
+        	$sql->execute(array($jwt['id']));
 	        if(($sql) AND ($sql->rowCount() != 0)) {
 	        	$res = [];
 
@@ -427,8 +430,19 @@
 
 			$jwt = (array)$jwt;
 
-			$sql = MySql::conectar()->prepare("SELECT * FROM `matches` INNER JOIN team_tournament_members AS members ON members.id_user=? INNER JOIN tournaments ON tournaments.id_tournament=matches.id_tournament WHERE id_team1=members.id_team OR id_team2=members.id_team");
-        	$sql->execute(array($jwt['id']));
+			// $sql = MySql::conectar()->prepare("SELECT * FROM `matches` INNER JOIN team_tournament_members AS members ON members.id_user=? INNER JOIN tournaments ON tournaments.id_tournament=matches.id_tournament WHERE id_team1=members.id_team OR id_team2=members.id_team");
+        	// $sql->execute(array($jwt['id']));
+
+			$sql = MySql::conectar()->prepare("
+			SELECT matches.*, team1.name_team AS name_team1, team2.name_team AS name_team2, t.* FROM `matches`
+			INNER JOIN tournaments AS `t` ON t.id_tournament = matches.id_tournament
+			INNER JOIN team_tournament_members ON team_tournament_members.id_user=:id_user 
+			INNER JOIN team_tournament AS team1 ON team1.id_team=matches.id_team1 
+            INNER JOIN team_tournament AS team2 ON team2.id_team=matches.id_team2 
+			
+			WHERE matches.id_team1=team_tournament_members.id_team OR matches.id_team2=team_tournament_members.id_team AND matches.result IS NULL");
+        	$sql->bindParam(':id_user', $jwt['id']);
+			$sql->execute();
 
 	        if(($sql) AND ($sql->rowCount() != 0)) {
 	        	$i = 0;
@@ -458,16 +472,24 @@
 			$jwt = (array)$jwt;
 
 			// $sql = MySql::conectar()->prepare("SELECT * FROM `matches` INNER JOIN team_tournament_members AS members ON members.id_user=? WHERE id_team1=members.id_team OR id_team2=members.id_team");
-			// $sql = MySql::conectar()->prepare("SELECT * FROM `matches` INNER JOIN tournaments AS `t` ON t.id_tournament = matches.id_tournament INNER JOIN team_tournament_members AS team1 ON team1.id_user=:id_user INNER JOIN team_tournament_members AS team2 ON team2.id_user=:id_user WHERE id_team1=team1.id_team OR id_team2=team2.id_team");
-        	// $sql->bindParam(':id_user', $jwt['id']);
-			// $sql->execute();
-			$sql = MySql::conectar()->prepare("SELECT * FROM `matches` INNER JOIN team_tournament_members AS members ON members.id_user=? WHERE result IS NULL AND id_team1=members.id_team OR id_team2=members.id_team ");
-			$sql->execute(array($jwt['id']));
+			$sql = MySql::conectar()->prepare("
+			SELECT matches.*, team1.name_team AS name_team1, team2.name_team AS name_team2, t.* FROM `matches`
+			INNER JOIN tournaments AS `t` ON t.id_tournament = matches.id_tournament
+			INNER JOIN team_tournament_members ON team_tournament_members.id_user=:id_user 
+			INNER JOIN team_tournament AS team1 ON team1.id_team=matches.id_team1 
+            INNER JOIN team_tournament AS team2 ON team2.id_team=matches.id_team2 
+			
+			WHERE matches.id_team1=team_tournament_members.id_team OR matches.id_team2=team_tournament_members.id_team AND matches.result IS NULL");
+        	$sql->bindParam(':id_user', $jwt['id']);
+			$sql->execute();
+			// $sql = MySql::conectar()->prepare("SELECT * FROM `matches` INNER JOIN team_tournament_members AS members ON members.id_user=? WHERE id_team1=members.id_team OR id_team2=members.id_team AND matches.result IS NULL");
+			// $sql->execute(array($jwt['id']));
 
 	        if(($sql) AND ($sql->rowCount() != 0)) {
 	        	$i = 0;
 	        	$res = [];
 	            while($data=$sql->fetch(PDO::FETCH_ASSOC)){
+					// $res[$i] = $data;
 	                $res[$i]=Returns::Match($data);
 	                $i++;
 	            }
@@ -550,7 +572,7 @@
 
 	        if($validate) {
 	        	$expired = $jwt->isExpiredToken($token);
-	        	return $expired;
+				return $expired;
 	        }
 	        else return false;
 		}//ok
@@ -591,9 +613,10 @@
 
                 $payload_refresh_token = $jwt->extractDataJWT($refresh_token, 1);
 		        $signature_refresh_token = $jwt->extractDataJWT($refresh_token, 2);
+		        $signature_access_token = $jwt->extractDataJWT($token, 2);
 
-                $sql = MySql::conectar()->prepare("SELECT * FROM `token` INNER JOIN `users` ON token.id_user = users.id WHERE refresh_token=?");
-                $sql->execute(array($signature_refresh_token));
+                $sql = MySql::conectar()->prepare("SELECT * FROM `token` INNER JOIN `users` ON token.id_user = users.id WHERE refresh_token=? AND access_token=?");
+                $sql->execute(array($signature_refresh_token, $signature_access_token));
 
                 if(($sql) AND ($sql->rowCount() != 0)) {
 
@@ -609,21 +632,27 @@
 					    'name'=>$data['name'],
 					    'id'=>$idUser
 					 ];
-					 $token = $jwt->criaToken($payload);
+					 $new_token = $jwt->criaToken($payload);
 					 $signature_access_token = $jwt->extractDataJWT($token, 2);
 
  		            $payload_refresh_token->exp = time()+$this->refresh_exp;
-					 $new_refresh_token = $jwt->criaToken($payload_refresh_token);
-		             $new_signature_refresh_token = $jwt->extractDataJWT($new_refresh_token, 2);
+					$new_refresh_token = $jwt->criaToken($payload_refresh_token);
+					$new_signature_refresh_token = $jwt->extractDataJWT($new_refresh_token, 2);
 
 		             $query = MySql::conectar()->prepare("UPDATE token SET access_token = ?, refresh_token = ?, expires_date = ? WHERE id = ?");
 					 $date = date('Y-m-d H:i:s', $payload_refresh_token->exp);
-					 $query->execute(array($signature_access_token, $new_signature_refresh_token, $date, $data['id']));
- 					 $res = ["data"=>$this->userTokenReturn($data['id_user'], $data['name'], $data['email'], $data['username'], $data['photo'], $token, $new_refresh_token)];
+
+					 if($query->execute(array($signature_access_token, $new_signature_refresh_token, $date, $data['id']))) {
+						$res = ["data"=>$this->userTokenReturn($data['id_user'], $data['name'], $data['email'], $data['username'], $data['photo'], $new_token, $new_refresh_token)];
+						$json = json_encode($res);
+						echo $json;
+					 } else {
+						print_r("teste");
+					 }
+					 
 
 
-			        $json = json_encode($res);
-					echo $json;
+
 
             	} else {
 			        $err = $err->getError("ERR_USER_NOT_FOUND");

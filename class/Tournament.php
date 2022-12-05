@@ -501,7 +501,12 @@
 		public function getTournamentMatches($param){
 			$err = new Errors();
 
-			$sql = MySql::conectar()->prepare("SELECT * FROM `matches` WHERE id_tournament=? ");
+			$sql = MySql::conectar()->prepare("
+			SELECT matches.*, team1.name_team AS name_team1, team2.name_team AS name_team2, tournaments.* FROM `matches` 
+			INNER JOIN team_tournament AS team1 ON team1.id_team=matches.id_team1 
+			INNER JOIN team_tournament AS team2 ON team2.id_team=matches.id_team2 
+			INNER JOIN tournaments ON tournaments.id_tournament=matches.id_tournament
+			WHERE matches.id_tournament=? ");
 			// $sql = MySql::conectar()->prepare("SELECT * FROM `matches` INNER JOIN tournaments ON `tournaments.id_tournament`=`matches.id_tournament` WHERE id_tournament=:id_tournament ");
         	$sql->execute(array($param));
 
@@ -510,6 +515,7 @@
         		$i = 0;
 	            while($data=$sql->fetch(PDO::FETCH_ASSOC)){
 	                // extract($pesquisa);
+					// $res[$i] = $data;
 	            	$res[$i] = Returns::Match($data);
 	            	$i++;
 	            }
@@ -519,7 +525,7 @@
 	            echo json_encode($response);
 
 	        } else {
-		        $err = $err->getError("ERR_TOURNAMENT_NOT_FOUND");
+		        $err = $err->getError("ERR_MATCH_NOT_FOUND");
 		        $res = ["errors"=> [$err]];
 
 		        http_response_code($err['status']);
@@ -648,5 +654,71 @@
 				exit;
 			}	
 		}
+		public function findMatch($param) {
+			$err = new Errors();
+
+			$sql = MySql::conectar()->prepare("
+			SELECT matches.*, team1.name_team AS name_team1, team2.name_team AS name_team2, tournaments.* FROM `matches` 
+			INNER JOIN team_tournament AS team1 ON team1.id_team=matches.id_team1 
+			INNER JOIN team_tournament AS team2 ON team2.id_team=matches.id_team2 
+			INNER JOIN tournaments ON tournaments.id_tournament=matches.id_tournament
+			WHERE id_match=? ");
+        	$sql->execute(array($param));
+
+	        if(($sql) AND ($sql->rowCount() != 0)) {
+	            $data = $sql->fetch(PDO::FETCH_ASSOC);
+				// $res = $data;
+	            $res = Returns::Match($data);
+
+				$response = ["data"=>$res];
+            	echo json_encode($response);
+            	http_response_code(200);
+	        } else {
+		        $err = $err->getError("ERR_TOURNAMENT_NOT_FOUND");
+		        $res = ["errors"=> [$err]];
+
+		        http_response_code($err['status']);
+		        echo json_encode($res);
+				exit;
+	        }//ok
+		}
+		public function findMatchMembers($param) {
+			$err = new Errors();
+
+			$sql = MySql::conectar()->prepare("
+			SELECT * FROM team_tournament_members AS member
+			INNER JOIN matches ON matches.id_match=:id_match
+			INNER JOIN users ON users.id=member.id_user
+			INNER JOIN team_tournament AS team ON team.id_team=member.id_team
+			WHERE member.id_team=matches.id_team1 OR member.id_team=matches.id_team2
+			ORDER BY member.id_team
+			");
+			$sql->bindParam(":id_match", $param);
+        	$sql->execute();
+
+	        if(($sql) AND ($sql->rowCount() != 0)) {
+				$res = [];
+				$i = 0;
+				while($data=$sql->fetch(PDO::FETCH_ASSOC)){
+	                // extract($pesquisa);
+
+					// $res[$i] = $data;
+	            	$res[$i] = Returns::MatchMember($data);
+	                $i++;
+	            }
+
+            	$response = ["data"=>$res];
+            	echo json_encode($response);
+            	http_response_code(200);
+	        } else {
+		        $err = $err->getError("ERR_TOURNAMENT_NOT_FOUND");
+		        $res = ["errors"=> [$err]];
+
+		        http_response_code($err['status']);
+		        echo json_encode($res);
+				exit;
+	        }//ok
+		}
+
 	}
 ?>

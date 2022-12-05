@@ -129,17 +129,27 @@
 						"photo"=>$match['photo'],
 						"sport"=>$match['sport'],
 						"invitation"=>$match['invitation'],
-						"id"=>$match['id_tournament']
+						"id"=>$match['id_tournament'],
+						"owner"=>$match['owner_id'],
+						"active"=>$match['active'],
 					] : $match['id_tournament'],
             		"time"=>$match['time'],            		
             		"result"=>$match['result'],   
             		"type"=>$match['type']     ,
-            		"team1"=>isset($match['name_team']) ? [
-            			"name"=>$match['name_team'],
+            		// "team1"=>isset($match['name_team']) ? [
+            		// 	"name"=>$match['name_team'],
+	            	// 	"id"=>$match['id_team1'],
+	            	// 	"active"=>$match['active'],
+	            	// 	"id_tournament"=>$match['id_tournament'],
+	            	// 	"owner"=>$match['owner']
+            		// ] : $match['id_team1'],   
+					"team1"=>isset($match['name_team1']) ? [
+            			"name"=>$match['name_team1'],
 	            		"id"=>$match['id_team1'],
-	            		"active"=>$match['active'],
-	            		"id_tournament"=>$match['id_tournament'],
-	            		"owner"=>$match['owner']
+            		] : $match['id_team1'],  
+					"team2"=>isset($match['name_team2']) ? [
+            			"name"=>$match['name_team2'],
+	            		"id"=>$match['id_team2'],
             		] : $match['id_team1'],   
             		"last_match"=>$match['last_match'] == 1 ? true : false 		
             	],
@@ -147,6 +157,28 @@
             		"self"=>"/match/".$match['id_match']
             	]
 			];
+			return $res;
+		}
+		public static function MatchMember($member) {
+			$res = [
+				"type"=> "member-members",
+            	"id"=> $member['id_user'],
+            	"attributes"=>[
+            		"name"=>$member['name'],
+            		"email"=>$member['email'],
+            		"username"=>$member['username'],
+            		"photo"=>$member['photo'],
+            		"tag"=>$member['tag'],
+					"team"=>[
+						"id_team"=>$member['id_team_member'],
+						"name_team"=>$member['name_team'],
+					]
+            	],
+            	"links"=>[
+            		"self"=>"/user/".$member['id_user']
+            	]
+			];
+			// $res = $member;
 			return $res;
 		}
 	}

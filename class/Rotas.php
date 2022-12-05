@@ -29,7 +29,6 @@ class Rotas
         if (substr_count($rota, "/") >= 3) {
             if(substr_count($rota, "/") == 4) {
                 $param = substr($rota, strrpos($rota, "/"));
-                print_r($param);
                 $a = explode("/", $rota);
                 $a[3] = "[PARAM]";
                 $rota = implode('/', $a);

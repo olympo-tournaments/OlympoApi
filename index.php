@@ -14,7 +14,7 @@
     $rota->add('PUT', '/api/user/[PARAM]', 'User::put', true, $roles['user']);
     $rota->add('GET', '/api/user/stats', 'User::getStats', true, $roles['user']);
 
-    $rota->add('GET', '/user/tournaments/[PARAM]', 'User::getUserTournaments', true, $roles['user']); //ok
+    $rota->add('GET', '/user/tournaments', 'User::getUserTournaments', true, $roles['user']); //ok
     $rota->add('GET', '/user/favorites', 'User::getUserFavorites', true, $roles['user']); //ok
     $rota->add('POST', '/user/favorites', 'User::addUserFavorites', true, $roles['user']); //ok
 
@@ -47,6 +47,8 @@
     $rota->add('POST', '/tournament/start', 'Tournament::startTournament', true, $roles['user']); //falta determinar as datas!!
     $rota->add('GET', '/tournament/matches/[PARAM]', 'Tournament::getTournamentMatches', true, $roles['user']); //ok
     $rota->add('POST', '/match/finish', 'Tournament::finishMatch', true, $roles['user']); //falta setar as equipes como nao ativas!
+    $rota->add('GET', '/api/match/[PARAM]', 'Tournament::findMatch', true, $roles['user']); 
+    $rota->add('GET', '/api/matchMembers/[PARAM]', 'Tournament::findMatchMembers', true, $roles['user']); 
 
     #team`
     $rota->add('POST', '/api/team', 'Team::post', true, $roles['user']); //ok
