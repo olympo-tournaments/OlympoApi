@@ -34,8 +34,11 @@
     // $rota->add('PUT', '/api/tournament/[PARAM]', 'Tournament::put', true, $roles['user']);
     // //---
     // $rota->add('GET', '/api/tournament/[PARAM]/teams', 'Tournament::getStats', true, $roles['user']);
-
+    
     $rota->add('GET', '/tournament/teams/[PARAM]', 'Tournament::getTeams', true, $roles['user']); //ok
+    $rota->add('GET', '/tournament/getTeamsMembers/[PARAM]', 'Tournament::getTeamsMembers', true, $roles['user']); //FAZER!
+    
+    $rota->add('GET', '/tournament/verify/[PARAM]', 'Tournament::verifyUserPartipatesTournament', true, $roles['user']);
 
     // $rota->add('POST', '/tournament/stats/[PARAM]', 'Tournament::setStats', true, $roles['user']);
     
@@ -60,7 +63,7 @@
     $rota->add('PUT', '/api/team/[PARAM]', 'Team::put', true, $roles['user']);
 
     $rota->add('GET', '/team/members/[PARAM]', 'Team::getMembers', true, $roles['user']);//ok
-    $rota->add('POST', '/team/members/[PARAM]', 'Team::addMember', true, $roles['user']);//ok 
+    $rota->add('POST', '/team/members', 'Team::addMember', true, $roles['user']);//ok 
 
     if(isset($_GET['url'])) {
         $rota->ir($_GET['url']);

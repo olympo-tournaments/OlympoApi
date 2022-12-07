@@ -119,6 +119,38 @@
             return $res;
 		}
 
+		public static function TeamAllMembersReturn($team) {
+			$members = [];
+			foreach($team as $key=>$member) {
+				$members[$key] = [
+					"id"=>$member['id'],
+					"name"=>$member['name'],
+					"email"=>$member['email'],
+					"username"=>$member['username'],
+					"photo"=>$member['photo'],
+					"tag"=>$member['tag']
+				];
+			}
+			$res = [
+            	"type"=> "team-members",
+            	"id"=> $team[0]['id_team'],
+            	"attributes"=>[
+					"team"=>[
+						"id"=>$team[0]['id_team'],
+						"name"=>$team[0]['name_team'],
+						"active"=>$team[0]['active'],
+						"owner"=>$team[0]['owner']
+					],
+					"members"=>$members
+            	],
+            	"links"=>[
+            		"self"=>"/user/".$team[0]['id_team']
+            	]
+            ];
+			// $res = $team;
+            return $res;
+		}
+
 		public static function Match($match) {
 			$res = [
             	"type"=> "match",
@@ -133,6 +165,11 @@
 						"id"=>$match['id_tournament'],
 						"owner"=>$match['owner_id'],
 						"active"=>$match['active'],
+						"description"=>$match['description'],
+						"type"=>$match['type'],
+						"twitch"=>isset($match['twitch']) ? $match['twitch'] : null,
+						"privacy"=>$match['privacy']
+						
 					] : $match['id_tournament'],
             		"time"=>$match['time'],            		
             		"result"=>$match['result'],   

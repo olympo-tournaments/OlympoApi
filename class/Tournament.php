@@ -220,6 +220,49 @@
 				exit;
 	        }
 		}//ok
+		public function getTeamsMembers($param) {
+
+			//fazer!!
+			$err = new Errors();
+
+			$sql = MySql::conectar()->prepare("SELECT * FROM `team_tournament` INNER JOIN team_tournament_members ON team_tournament.id_team=team_tournament_members.id_team INNER JOIN users ON users.id=team_tournament_members.id_user WHERE team_tournament.id_tournament=?");
+        	$sql->execute(array($param));
+
+	        if(($sql) AND ($sql->rowCount() != 0)) {
+	        	$i = 0;
+	        	$res = [];
+	            while($data=$sql->fetch(PDO::FETCH_ASSOC)){
+					$res[$i] = $data;
+	                // $res[$i]=Returns::TeamReturn($data);
+	                $i++;
+	            }
+
+				$response = $res;
+
+				$data = [];
+
+				foreach($res as $elm){
+					// print_r($elm['id_team']);
+					$data[$elm['id_team']][] = $elm;
+				}
+
+				$response = [];
+				foreach($data as $key=>$value){
+					$response[$key] = Returns::TeamAllMembersReturn($value);
+				}
+
+            	$response = ["data"=>$response];
+            	echo json_encode($response);
+            	http_response_code(200);
+	        } else {
+		        $err = $err->getError("ERR_TEAM_NOT_FOUND");
+		        $res = ["errors"=> [$err]];
+
+		        http_response_code($err['status']);
+		        echo json_encode($res);
+				exit;
+	        }
+		}//ok
 		public function getStats() {
 			echo "receber estatisticas torneio";
 		}
@@ -318,6 +361,39 @@
 				exit;
 	        }
 		}//ok
+
+		public function verifyUserPartipatesTournament($param, $jwt) {
+			$err = new Errors();
+
+			if(!isset($param)) {
+				$err = $err->getError("ERR_INVALID_DATA");
+				$res = ["errors"=> [$err]];
+
+				http_response_code($err['status']);
+				echo json_encode($res);
+				exit;	
+			}
+			$jwt = (array)$jwt;
+
+			$sql = MySql::conectar()->prepare("SELECT * FROM `team_tournament_members` INNER JOIN team_tournament ON team_tournament.id_team=team_tournament_members.id_team WHERE team_tournament_members.id_tournament=? AND team_tournament_members.id_user=?");
+        	$sql->execute(array($param, $jwt['id']));
+
+	        if(($sql) AND ($sql->rowCount() != 0)) {
+	            $data = $sql->fetch(PDO::FETCH_ASSOC);
+	            $res = Returns::TeamReturn($data);
+
+            	$response = ["data"=>$res];
+            	echo json_encode($response);
+            	http_response_code(200);
+	        } else {
+		        $err = $err->getError("ERR_TEAM_NOT_FOUND");
+		        $res = ["errors"=> [$err]];
+
+		        http_response_code($err['status']);
+		        echo json_encode($res);
+				exit;
+	        }//ok
+		}
 
 		public function findCategory($param) {
 			$err = new Errors();

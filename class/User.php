@@ -490,8 +490,10 @@
 	        	$res = [];
 	            while($data=$sql->fetch(PDO::FETCH_ASSOC)){
 					// $res[$i] = $data;
-	                $res[$i]=Returns::Match($data);
-	                $i++;
+					if($data['result'] == null) {
+						$res[$i]=Returns::Match($data);
+						$i++;
+					}
 	            }
 
             	$response = ["data"=>$res];

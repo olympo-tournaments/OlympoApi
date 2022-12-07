@@ -34,7 +34,7 @@
 				$jwt = (array)$jwt;
 
 				#
-				$verifyUserTournament = MySql::conectar()->prepare("SELECT * FROM team_tournament_members WHERE id_user=? AND id_team=?");
+				$verifyUserTournament = MySql::conectar()->prepare("SELECT * FROM team_tournament_members WHERE id_user=? AND id_tournament=?");
                 $verifyUserTournament->execute(array($jwt['id'], $id_tournament));
 
                 if($verifyUserTournament->rowCount() >= 1){
